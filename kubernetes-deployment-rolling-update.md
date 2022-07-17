@@ -54,6 +54,10 @@ thor@jump_host ~$ kubectl patch deployment nginx-deployment --type='json' -p='[{
 deployment.apps/nginx-deployment patched
 ```
 
+* Preferably set image for nginx-container of deployment to be nginx:1.18
+thor@jump_host ~$ kubectl set image deployment/nginx-deployment nginx-container=nginx:1.18
+deployment.apps/nginx-deployment image updated
+
 * Confirm pods are being replaced with new pods whose image is nginx:1.18
 ```
 thor@jump_host ~$ kubectl get pod
