@@ -1,0 +1,106 @@
+## Problem
+```
+We have an application running on Kubernetes cluster using nginx web server.
+The Nautilus application development team has pushed some of the latest changes and those changes need be deployed.
+The Nautilus DevOps team has created an image nginx:1.18 with the latest changes.
+
+Perform a rolling update for this application and incorporate nginx:1.18 image. The deployment name is nginx-deployment
+Make sure all pods are up and running after the update.
+
+Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
+```
+## Solution
+* Install terraform on jump host via yum
+```
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+sudo yum -y install terraform
+```
+
+* Terraform binary can be used without installation
+```
+sudo yum -y install wget unzip
+wget https://releases.hashicorp.com/terraform/1.1.5/terraform_1.1.5_linux_amd64.zip
+unzip terraform_1.1.5_linux_amd64.zip
+sudo mv terraform /usr/local/bin
+sudo chmod a+x /usr/local/bin/terraform
+terraform version
+terraform init
+terraform plan
+```
+
+* Create terraform configuration file to import state of deployment - use kubernetes provider
+```
+cat >main.tf<<EOF
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+}
+
+resource "kubernetes_deployment_v1" "nginx-deployment" {
+}
+EOF
+
+thor@jump_host ~$ ./terraform init
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Finding latest version of hashicorp/kubernetes...
+- Installing hashicorp/kubernetes v2.12.1...
+- Installed hashicorp/kubernetes v2.12.1 (signed by HashiCorp)
+
+Terraform has created a lock file .terraform.lock.hcl to record the provider
+selections it made above. Include this file in your version control repository
+so that Terraform can guarantee to make the same selections by default when
+you run "terraform init" in the future.
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+thor@jump_host ~$ ./terraform import kubernetes_deployment_v1.nginx-deployment default/nginx-deployment
+kubernetes_deployment_v1.nginx-deployment: Importing from ID "default/nginx-deployment"...
+kubernetes_deployment_v1.nginx-deployment: Import prepared!
+  Prepared kubernetes_deployment_v1 for import
+kubernetes_deployment_v1.nginx-deployment: Refreshing state... [id=default/nginx-deployment]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+
+thor@jump_host ~$ ./terraform state list
+kubernetes_deployment_v1.nginx-deployment
+thor@jump_host ~$ ./terraform fmt -no-color
+thor@jump_host ~$ cat >main.tf<<EOF
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+}
+EOF
+thor@jump_host ~$ ./terraform show -no-color kubernetes_deployment_v1.nginx-deployment >> main.tf
+sed -i 's/nginx:1.16/nginx:1.18/' main.tf
+sed -i '/ id =/d' main.tf
+sed -i '/ generation /d' main.tf
+sed -i '/ resource_version = /d' main.tf
+sed -i '/ uid /d' main.tf
+sed -i '/ timeouts /d' main.tf
+sed -i '/ node_selector /d' main.tf
+sed -i '/ active_deadline_seconds/d' main.tf
+sed -i '/ automount_service_account_token/d' main.tf
+sed -i '/ dns_policy/d' main.tf
+sed -i '/ enable_service_links/d' main.tf
+sed -i '/ host_ipc/d' main.tf
+sed -i '/ host_network/d' main.tf
+sed -i '/ host_pid/d' main.tf
+sed -i '/ node_selector/d' main.tf
+sed -i '/ restart_policy/d' main.tf
+sed -i '/ share_process_namespace/d' main.tf
+sed -i '/ termination_grace_period_seconds/d' main.tf
+thor@jump_host ~$ ./terraform apply
+```
+
