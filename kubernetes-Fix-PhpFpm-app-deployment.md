@@ -74,8 +74,10 @@ nginx-phpfpm-dp-5cccd45499-ltcph   2/2     Running   0          14m
 ```  
 ### Test service
 thor@jump_host ~$ `curl $(kubectl get pod nginx-phpfpm-dp-5cccd45499-ltcph -o jsonpath='{.spec.nodeName}'):30008`
+```
 curl: (7) Failed connect to kodekloud-control-plane:30008; Connection refused
-  
+```
+
 ### Troubleshoot deployment to see what port nginx application is configured to listen on  
 thor@jump_host ~$ `kubectl describe deployment nginx-phpfpm-dp`
 ```
@@ -131,8 +133,9 @@ Events:
   Type    Reason             Age    From                   Message
   ----    ------             ----   ----                   -------
   Normal  ScalingReplicaSet  4m52s  deployment-controller  Scaled up replica set nginx-phpfpm-dp-5cccd45499 to 1
-
-thor@jump_host ~$ kubectl get cm
+```
+thor@jump_host ~$ `kubectl get cm`
+```
 NAME               DATA   AGE
 kube-root-ca.crt   1      5h42m
 nginx-config       1      26m
@@ -170,8 +173,8 @@ http {
 }
 
 Events:  <none>
-thor@jump_host ~$
 ```
+
 ### Discovery: nginx container is using a configmap volume which nginx listen on port 80, and service's targetport is 8091.  Also index is missing index.php
 #### Solution: update service's targetPort to be 80,
 thor@jump_host ~$ `kubectl patch svc nginx-service -p '{"spec": {"ports": [{"nodePort": 30008, "targetPort": 80, "port": 8091}]}}'`
@@ -199,7 +202,7 @@ Events:
   Normal  Type    27m   service-controller  LoadBalancer -> NodePort
 ```
 #### Solution: Update configmap to include index.php in index line
-thor@jump_host ~$ `kubectl get cm nginx-config -o yaml | sed 's/index  index.html index.htm/index  index.html index.php index.htm/' | kubectl replace -f -
+thor@jump_host ~$ `kubectl get cm nginx-config -o yaml | sed 's/index  index.html index.htm/index  index.html index.php index.htm/' | kubectl replace -f -`
 ```
 configmap/nginx-config replaced
 ```
@@ -241,11 +244,12 @@ http {
 Events:  <none>
 ## Solution
 ```
-thor@jump_host ~$ kubectl rollout restart deployment nginx-phpfpm-dp
+#### Restart deployment instead of waiting for it self restart, and test service
+thor@jump_host ~$ `kubectl rollout restart deployment nginx-phpfpm-dp`
 ```
 deployment.apps/nginx-phpfpm-dp restarted
 ```
-### Test and copy /tmp/index.php into nginx-container
+##### Test index.php and copy /tmp/index.php into nginx-container
 thor@jump_host ~$ `echo a > index.php`
 thor@jump_host ~$ `kubectl cp index.php nginx-phpfpm-dp-6b978c999b-6zr2d:/var/www/html/index.php -c nginx-container`
 thor@jump_host ~$ `curl $(kubectl get pod nginx-phpfpm-dp-6b978c999b-6zr2d -o jsonpath='{.spec.nodeName}'):30008`
