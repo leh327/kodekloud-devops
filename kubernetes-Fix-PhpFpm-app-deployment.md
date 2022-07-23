@@ -104,7 +104,7 @@ Pod Template:
     Host Port:    <none>
     Environment:  <none>
     Mounts:
-      /etc/nginx/nginx.conf from `nginx-config-volume` (rw,path="nginx.conf")
+      /etc/nginx/nginx.conf from nginx-config-volume (rw,path="nginx.conf")
       /var/www/html from shared-files (rw)
    php-fpm-container:
     Image:        php:7.3-fpm
@@ -257,8 +257,8 @@ thor@jump_host ~$ `kubectl rollout restart deployment nginx-phpfpm-dp`
 deployment.apps/nginx-phpfpm-dp restarted
 ```
 ##### Test index.php and copy /tmp/index.php into nginx-container
-thor@jump_host ~$ `echo a > index.php`
-thor@jump_host ~$ `kubectl cp index.php nginx-phpfpm-dp-6b978c999b-6zr2d:/var/www/html/index.php -c nginx-container`
+thor@jump_host ~$ `echo a > index.php`  
+thor@jump_host ~$ `kubectl cp index.php nginx-phpfpm-dp-6b978c999b-6zr2d:/var/www/html/index.php -c nginx-container`  
 thor@jump_host ~$ `curl $(kubectl get pod nginx-phpfpm-dp-6b978c999b-6zr2d -o jsonpath='{.spec.nodeName}'):30008`
 ```
 a
