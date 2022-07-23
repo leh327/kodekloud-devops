@@ -16,15 +16,19 @@ Note: The kubectl utility on jump_host has been configured to work with the kube
 ```
 ## Discovery/solution
 
+
+thor@jump_host ~$ `kubectl get ns`
 ```
-thor@jump_host ~$ kubectl get ns
 NAME                 STATUS   AGE
 default              Active   5h17m
 kube-node-lease      Active   5h17m
 kube-public          Active   5h17m
 kube-system          Active   5h17m
 local-path-storage   Active   5h17m
-thor@jump_host ~$ kubectl get all
+```
+
+thor@jump_host ~$ `kubectl get all`
+```
 NAME                                   READY   STATUS    RESTARTS   AGE
 pod/nginx-phpfpm-dp-5cccd45499-ltcph   2/2     Running   0          59s
 
@@ -139,7 +143,10 @@ thor@jump_host ~$ `kubectl get cm`
 NAME               DATA   AGE
 kube-root-ca.crt   1      5h42m
 nginx-config       1      26m
-thor@jump_host ~$ kubectl describe cm nginx-config
+```
+
+thor@jump_host ~$ `kubectl describe cm nginx-config`
+```
 Name:         nginx-config
 Namespace:    default
 Labels:       <none>
