@@ -50,12 +50,12 @@ spec:
     - name: volume-share
       mountPath: /tmp/cluster
 ```
-thor@jump_host $ `kubectl create -f volume-share-devops.yaml`
+thor@jump_host $ `kubectl create -f volume-share-devops.yaml`  
 thor@jump_host $ `kubectl wait --for=condition=ready pod volume-share-devops`
 ```
 pod/volume-share-devops condition met
 ```
-thor@jump_host $ `kubectl exec -it $(kubectl get pod -o name) -c volume-container-devops-1 -- touch /tmp/beta/beta.txt`
+thor@jump_host $ `kubectl exec -it $(kubectl get pod -o name) -c volume-container-devops-1 -- touch /tmp/beta/beta.txt`  
 thor@jump_host $ `kubectl exec -it $(kubectl get pod -o name) -c volume-container-devops-2 -- ls /tmp/beta/beta.txt`
 ```
 /tmp/cluster/beta.txt
