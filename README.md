@@ -1,5 +1,6 @@
 # kodekloud-devops
 ## Record solution for reviewed tasks from kodekloud
+### kubernetes-persistent-volume.md
 ### ansible-create-symlink-and-different-file-for-each-server.md
 ### kubernetes-Fix-PhpFpm-app-deployment.md
 ### kubernetes-deployment-rolling-update.md
