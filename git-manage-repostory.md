@@ -23,22 +23,21 @@ for review in case your task is marked incomplete. You may also consider using a
 
 # Solution:
 thor@jump_host ~$ `ssh max@ststor01`  
+max $ `git clone http://git.stratos.xfusioncorp.com/max/story_news.git`  
+Cloning into 'story_news'...  
+warning: You appear to have cloned an empty repository.  
+Checking connectivity... done.  
 
-max $ `git clone http://git.stratos.xfusioncorp.com/max/story_news.git`
-Cloning into 'story_news'...
-warning: You appear to have cloned an empty repository.
-Checking connectivity... done.
-```
-max $ `ls`                                                                                                                    
-story_news                                                                                                                  
-max $ `cp -r /usr/finance/* story_news/`
-max $ `cd story_news`
-max $ `git add .`
-max $ `git commit -m "add stories"`
-max $ `git push`
-max $ `git checkout -b max_games`
-max $ `cp /tmp/stories/story-index-max.txt .`
-max $ `sed -i 's/Mosose/Mouse/' story-index-max.txt`
-max $ `git add .`
-max $ `git commit -m "typo fixed for Mooose"`
-max $ `git push --set-upstream origin max_games`
+max $ `ls`  
+story_news  
+max $ `cp -r /usr/finance/* story_news/`  
+max $ `cd story_news`  
+max $ `git add .`  
+max $ `git commit -m "add stories"`  
+max $ `git push`  
+max $ `git checkout -b max_games`  
+max $ `cp /tmp/stories/story-index-max.txt .`  
+max $ `sed -i 's/Mosose/Mouse/' story-index-max.txt`  
+max $ `git add .`  
+max $ `git commit -m "typo fixed for Mooose"`  
+max $ `git push --set-upstream origin max_games`  
