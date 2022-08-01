@@ -1,6 +1,6 @@
 # kodekloud-devops
 ## Record solution for reviewed tasks from kodekloud  
-[ansible-configure-sftp.md](https://github.com/leh327/kodekloud-devops/blob/main/ansible-configure-sftp.md)
+[ansible-configure-sftp.md](https://github.com/leh327/kodekloud-devops/blob/main/ansible-configure-sftp.md)  
 [ansible-create-symlink-and-different-file-for-each-server.md](https://github.com/leh327/kodekloud-devops/blob/main/ansible-create-symlink-and-different-file-for-each-server.md)  
 [apache-add-response-header.md](https://github.com/leh327/kodekloud-devops/blob/main/apache-add-response-header.md)  
 [git-manage-repostory.md](https://github.com/leh327/kodekloud-devops/blob/main/git-manage-repostory.md)  
