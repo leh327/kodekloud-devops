@@ -18,14 +18,14 @@ d. SFTP user should only be allowed to make SFTP connections.
 #### Create inventory and ansible.cfg for kodekloud-engineer servers
 ```
 cat > inventory<<EOF
+[app]
 stapp01 ansible_user=tony ansible_password=Ir0nM@n ansible_sudo_pass=Ir0nM@n
 stapp02 ansible_user=steve ansible_password=Am3ric@ ansible_sudo_pass=Am3ric@
 stapp03 ansible_user=banner ansible_password=BigGr33n ansible_sudo_pass=BigGr33n
-stmail01 ansible_user=groot ansible_password=Gr00T123 ansible_sudo_pass=Gr00T123
 [test]
-stapp01 ansible_user=jaems ansible_password=LQfKeWWxWD
-stapp02 ansible_user=james ansible_password=LQfKeWWxWD
-stapp03 ansible_user=banner ansible_password=LQfKeWWxWD
+172.16.238.10 ansible_user=james ansible_password=LQfKeWWxWD
+172.16.238.11 ansible_user=james ansible_password=LQfKeWWxWD
+172.16.238.12 ansible_user=james ansible_password=LQfKeWWxWD
 EOF
 
 cat >ansible.cfg<<EOF
@@ -40,7 +40,7 @@ EOF
 ```
 cat > configure_sftp.yml <<EOF
 - name: configure sftp account
-  hosts: '{{ target_host }}'
+  hosts: app
   become: yes
   gather_facts: no
   vars_prompt:
@@ -65,6 +65,11 @@ cat > configure_sftp.yml <<EOF
       owner: root
       group: root
       mode: '0755'
+  - name: comment out the default sftp subsystem
+    replace:
+      path: /etc/ssh/sshd_config
+      regexp: "^Subsystem"
+      replace: "#Subsystem"
   - name: add sftp config for user
     blockinfile:
       path: /etc/ssh/sshd_config
@@ -81,17 +86,18 @@ cat > configure_sftp.yml <<EOF
 - hosts: test
   gather_facts: no
   tasks:
+  - name: test sftp
+    shell: sshpass -p {{ ansible_password }} sftp {{ ansible_user }}@{{inventory_hostname}}
+    register: sftp_test
+  - debug: var=sftp_test
+
+    
   - name: test ssh
     shell: who am i
-    delegate_to: localhost
     register: ssh_test
   - debug: var=ssh_test
   
-  - name: test sftp
-    shell: sshpass -p {{ ansible_user_pass }} sftp -r {{ ansible_user }}@{{inventory_hostname}}/* /tmp/
-    register: sftp_test
-  - debug: var=sftp_test
 EOF
 
-ansible-playbook -i inventory configure_sftp.yml -e target_host=stapp03
+ansible-playbook -i inventory configure_sftp.yml
 ```
