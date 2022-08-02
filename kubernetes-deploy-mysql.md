@@ -78,8 +78,8 @@ metadata:
   name: mysql-user-pass
 type: Opaque
 data:
-  username: a29kZWtsb3VkX3RvcA==
-  password: VG1QY1pqdFJReA==
+  username: a29kZWtsb3VkX2dlbQ==
+  password: ZENWM3N6U0dOQQ==
 
 ---
 apiVersion: v1
@@ -151,12 +151,14 @@ spec:
       nodePort: 30007
 EOF
 ```
+### deploy mysql deployment
 thor@jump_host ~$ `kubectl apply -f mysql-deployment.yaml`  
 thor@jump_host ~$ `kubectl wait --for=condition=ready pod --selector=app=mysql`
 ```
 pod/mysql-deployment-7587dffdf6-mpdmz condition met
 ```
 
+### test connectivity
 thor@jump_host ~$ `ssh -v -p 30007 $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}')`
 ```
 OpenSSH_7.6p1 Ubuntu-4ubuntu0.7, OpenSSL 1.0.2n  7 Dec 2017
@@ -165,15 +167,62 @@ debug1: /etc/ssh/ssh_config line 19: Applying options for *
 debug1: Connecting to node01 [10.32.140.5] port 30007.
 debug1: Connection established.
 ```
+
+### Install mysql client and test database access (For ubuntu: apt update; apt install mysql-client -y)
 thor@jump_host ~$ `sudo yum install mysql -y`  
-thor@jump_host ~$ `mysql -u kodekloud_gem -pdCV3szSGNA kodekloud_db9 -h $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}') -P 30007`
+thor@jump_host ~$ `mysql -u kodekloud_gem -pdCV3szSGNA -h $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}') -P 30007`  
 ```
-mysql -u kodekloud_gem -pdCV3szSGNA kodekloud_db9 -h $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}') -P 30007
 mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 11
+Server version: 8.0.30 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> \q
 ```
-If one has access to node hosting mysql pod and it is using docker engine, use the following:  
-root@node01 ~ ➜  `docker exec -it -u mysql f59a44520763 bash`
+#### If one want to test mysql database right on the container:  
+thor@jump_host ~$ `kubectl exec -it mysql-deployment-7587dffdf6-tsplg -- mysql -u kodekloud_gem -pdCV3szSGNA`
 ```
-bash-4.4$ mysql -u kodekloud_gem -pdCV3szSGNA kodekloud_db9
 mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 12
+Server version: 8.0.30 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> \q
+Bye
+```
+
+#### If one has access to node hosting mysql pod and it is using docker engine, use the following:  
+root@node01 ~ ➜  `docker exec -it -u mysql f59a44520763 mysql -u kodekloud_gem -pdCV3szSGNA`
+```
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 12
+Server version: 8.0.30 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> \q
+Bye
 ```
