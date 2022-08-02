@@ -26,6 +26,7 @@ Note: Validation will try to run the playbook using command ansible-playbook -i 
   
 thor@jump_host ~/ansible$ `cat > playbook.yml<<EOF`
 ```
+---
 - name: copy template to /var/www/html/index.html
   hosts: stapp01
   become: true
@@ -35,13 +36,14 @@ EOF
 ```
 
 ### Create template file
-thor@jump_host ~/ansible$ `cat >role/httpd/templates/index.html.j2<<EOF`
 ```
+thor@jump_host ~/ansible$ cat >role/httpd/templates/index.html.j2<<EOF
 This file was created using Ansible on {{ inventory_hostname }}
 EOF
 ```
 
-### Create task to create index.html from template
+### Create task to create index.html from template  
+  
 thor@jump_host ~/ansible$ `cat >role/httpd/tasks/main.yml <<EOF`
 ```
 ---
