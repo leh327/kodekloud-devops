@@ -5,6 +5,7 @@ thor@jump_host ~$ `sudo yum install openssl -y`
 thor@jump_host ~$ `./get_helm.sh`  
 thor@jump_host ~$ `chmod g= .kube/config`  
 thor@jump_host ~$ `helm create jenkins`  
+
 thor@jump_host ~$ `cat > jenkins/values.yaml<<EOF`  
 ```
 # Default values for jenkins.
@@ -25,7 +26,9 @@ service:
   nodePort: 30008
 EOF
 ```
+
 thor@jump_host ~$ `cat jenkins/templates/service.yaml` 
+```
 apiVersion: v1
 kind: Service
 metadata:
@@ -130,6 +133,7 @@ app: {{ "jenkins" }}
 {{- end }}
 EOF
 ```
+
 thor@jump_host ~$ `cat >jenkins/templates/deployment.yaml<<EOF`
 ```
 apiVersion: apps/v1
@@ -157,4 +161,18 @@ spec:
               protocol: TCP
 EOF
 ```
-helm install --create-namespace --namespace jenkins jenkins-deployment jenkins
+
+thor@jump_host ~$ `helm install --create-namespace --namespace jenkins jenkins-deployment jenkins`  
+
+thor@jump_host ~$ `kubectl logs pod/jenkins-deployment-758c65f9bc-7mlgx -n jenkins |grep password -A2`
+```
+Jenkins initial setup is required. An admin user has been created and a password generated.
+Please use the following password to proceed to installation:
+
+37ee14e852d34bc4b53294ac4a521d08
+```
+
+thor@jump_host ~$ `curl $(kubectl get pod -n jenkins -o jsonpath='{.items[*].spec.nodeName}'):30008`
+```
+Authentication required                                     
+```
