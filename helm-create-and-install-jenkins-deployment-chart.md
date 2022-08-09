@@ -27,7 +27,7 @@ service:
 EOF
 ```
 
-thor@jump_host ~$ `cat jenkins/templates/service.yaml` 
+thor@jump_host ~$ `cat >jenkins/templates/service.yaml<<EOF` 
 ```
 apiVersion: v1
 kind: Service
