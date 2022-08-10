@@ -18,4 +18,43 @@ You can use any labels as per your choice.
 Note: The kubectl on jump_host has been configured to work with the kubernetes cluster.
 
 # Solution
-
+thor@jump_host ~$ `cat > nagios-deployment <<EOF`
+```
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nagios-deployment
+  name: nagios-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nagios-deployment
+  template:
+    metadata:
+      labels:
+        app: nagios-deployment
+    spec:
+      containers:
+        - image: jasonrivers/nagios
+          name: nagios-container
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nagios-service
+spec:
+  selector:
+    app: nagios-deployment
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30008
+  type: NodePort
+EOF
+```
+Logon to nagios webui and create user in requirement `2`
