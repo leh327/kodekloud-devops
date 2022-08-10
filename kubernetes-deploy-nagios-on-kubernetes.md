@@ -57,4 +57,15 @@ spec:
   type: NodePort
 EOF
 ```
+thor@jump_host ~$ `kubectl apply -f nagios-deployment` 
+```
+deployment.apps/nagios-deployment created
+service/nagios-service created
+```
+thor@jump_host ~$ `kubectl wait --for=condition=ready pods --selector=app=nagios-deployment`
+```
+pod/nagios-deployment-5f6c8f586f-72zj4 condition met
+```
+thor@jump_host ~$ 
+
 Logon to nagios webui and create user in requirement `2`
