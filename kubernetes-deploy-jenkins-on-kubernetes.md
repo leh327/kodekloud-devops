@@ -86,4 +86,6 @@ Authentication required
 </body></html>
 ```
 thor@jump_host ~$ 
-thor@jump_host ~$ 
+
+# Reference:
+[configure jenkins as code](https://www.digitalocean.com/community/tutorials/how-to-automate-jenkins-setup-with-docker-and-jenkins-configuration-as-code)
