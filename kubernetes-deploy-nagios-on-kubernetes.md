@@ -69,5 +69,12 @@ pod/nagios-deployment-5f6c8f586f-72zj4 condition met
 thor@jump_host ~$ 
 
 Add nagios webui user following this doc(https://www.ibm.com/docs/en/power8?topic=POWER8/p8ef9/p8ef9_ppim_nagios_userid.htm)  
-htpasswd /usr/local/nagios/etc/htpasswd.users xFusionCorp  
+
+thor@jump_host ~$ `kubectl exec -it $(kubectl get pod -o name) -- htpasswd /opt/nagios/etc/htpasswd.users xFusionCorp`
+```
+New password: 
+Re-type new password: 
+Adding password for user xFusionCorp
+```
+thor@jump_host ~$ 
 
