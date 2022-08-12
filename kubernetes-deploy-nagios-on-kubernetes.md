@@ -18,8 +18,20 @@ You can use any labels as per your choice.
 Note: The kubectl on jump_host has been configured to work with the kubernetes cluster.
 
 # Solution
-thor@jump_host ~$ `cat > nagios-deployment <<EOF`
+
+
+### Create deployment using secret and volume with user/password for nagios core webui auth
+thor@jump_host ~$ `sudo yum -y install httpd-tools`  
+
+thor@jump_host ~$ `cat <<EOF | kubectl apply -f -`
 ```
+---
+apiVersion: v1
+kind: Secret
+data:
+  htpasswd.users: $(htpasswd -nb xFusionCorp LQfKeWWxWD | base64)
+metadata:
+  name: nagios-htpasswd
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -37,9 +49,17 @@ spec:
       labels:
         app: nagios-deployment
     spec:
+      volumes:
+      - name: nagios-htpasswd
+        secret:
+          secretName: nagios-htpasswd
       containers:
         - image: jasonrivers/nagios
           name: nagios-container
+          volumeMounts:
+          - mountPath: /opt/nagios/etc/htpasswd.users
+            subPath: htpasswd.users
+            name: nagios-htpasswd
           ports:
             - containerPort: 80
 ---
@@ -57,24 +77,13 @@ spec:
   type: NodePort
 EOF
 ```
-thor@jump_host ~$ `kubectl apply -f nagios-deployment` 
-```
-deployment.apps/nagios-deployment created
-service/nagios-service created
-```
+
 thor@jump_host ~$ `kubectl wait --for=condition=ready pods --selector=app=nagios-deployment`
 ```
 pod/nagios-deployment-5f6c8f586f-72zj4 condition met
 ```
-thor@jump_host ~$ 
+thor@jump_host ~$ `curl $(kubectl get pod -o name):30008`
 
-Add nagios webui user following this doc(https://www.ibm.com/docs/en/power8?topic=POWER8/p8ef9/p8ef9_ppim_nagios_userid.htm)  
-
-thor@jump_host ~$ `kubectl exec -it $(kubectl get pod -o name) -- htpasswd /opt/nagios/etc/htpasswd.users xFusionCorp`
-```
-New password: 
-Re-type new password: 
-Adding password for user xFusionCorp
-```
-thor@jump_host ~$ 
-
+# References
+1. Add nagios webui user following this doc(https://www.ibm.com/docs/en/power8?topic=POWER8/p8ef9/p8ef9_ppim_nagios_userid.htm)  
+2. How to add user/password to kubernetes pod via secret and configmap (https://github.com/rohnux/K8s-nginx_deployment.yaml/blob/master/commands)
