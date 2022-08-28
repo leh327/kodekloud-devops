@@ -14,7 +14,8 @@ Limits: Memory: 20Mi, CPU: 100m
 Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
 
 # Solution
-cat <<EOF | kubectl apply -f -
+thor@jump_host ~$ `cat <<EOF | kubectl apply -f -`
+```
 apiVersion: v1                                                                                                                                                  "jump_host.stratos.xfus" 13:31 28-Aug-22
 kind: Pod
 metadata:
@@ -27,10 +28,12 @@ spec:
     name: httpd-container
     resources: 
       limits:
-        memory: 200Mi
+        memory: 20Mi
         cpu: 100m
       requests:
         memory: 15Mi
         cpu: 100m
 EOF
-kubectl wait --for=condition=ready pods --selector=run=httpd-pod
+```
+thor@jump_host ~$ `kubectl wait --for=condition=ready pods --selector=run=httpd-pod`  
+thor@jump_host ~$ `kubectl describe pod | grep -e limits -e requests -e httpd-container -A3 -B1`
