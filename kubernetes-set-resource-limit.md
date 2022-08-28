@@ -16,7 +16,7 @@ Note: The kubectl utility on jump_host has been configured to work with the kube
 # Solution
 thor@jump_host ~$ `cat <<EOF | kubectl apply -f -`
 ```
-apiVersion: v1                                                                                                                                                  "jump_host.stratos.xfus" 13:31 28-Aug-22
+apiVersion: v1
 kind: Pod
 metadata:
   labels:
