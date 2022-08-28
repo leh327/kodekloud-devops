@@ -36,4 +36,4 @@ spec:
 EOF
 ```
 thor@jump_host ~$ `kubectl wait --for=condition=ready pods --selector=run=httpd-pod`  
-thor@jump_host ~$ `kubectl describe pod | grep -e limits -e requests -e httpd-container -A3 -B1`
+thor@jump_host ~$ `kubectl describe pod | grep -e Limits -e Requests -e httpd-container -A3 -B1`
