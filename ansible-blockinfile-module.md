@@ -56,7 +56,7 @@ thor@jump_host ~/ansible$ `cat >playbook.yml<<EOF`
 EOF
 ```
 thor@jump_host ~/ansible$ `ansible-playbook -i inventory playbook.yml`  
-thor@jump_host ~/ansible$ `ansible all -i inventory -m shell -a "ls -l /var/www/html/index.html; cat /var/www/html/index.html`
+thor@jump_host ~/ansible$ `ansible all -i inventory -m shell -a "ls -l /var/www/html/index.html; cat /var/www/html/index.html"`
 ```
 stapp01 | CHANGED | rc=0 >>
 total 4
