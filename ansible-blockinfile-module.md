@@ -52,7 +52,7 @@ thor@jump_host ~/ansible$ `cat >playbook.yml<<EOF`
       state: present
       owner: apache
       group: apache
-      mode: `0777`
+      mode: '0777'
 EOF
 ```
 thor@jump_host ~/ansible$ `ansible-playbook -i inventory playbook.yml`  
