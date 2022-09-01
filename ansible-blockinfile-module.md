@@ -48,6 +48,7 @@ thor@jump_host ~/ansible$ `cat >playbook.yml<<EOF`
       block: |
         Welcome to XfusionCorp!
         This is Nautilus sample file, created using Ansible!
+        Please do not modify this file manually!
       state: present
       owner: apache
       group: apache
