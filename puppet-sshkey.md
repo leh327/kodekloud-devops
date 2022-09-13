@@ -47,7 +47,7 @@ The key's randomart image is:
 ```
 root@jump_host ~# `cat > /etc/puppetlabs/code/environments/production/manifests/demo.pp<<EOF`
 ```
-\$thor_sshkey='$(awk "{print $2}" ~thor/.ssh/id_rsa.pub)'
+\$thor_sshkey='$(awk '{print $2}' ~thor/.ssh/id_rsa.pub)'
 class ssh_node1 {
   ssh_authorized_key { 'tony@stapp01.stratos.xfusioncorp.com':
     ensure => 'present',
