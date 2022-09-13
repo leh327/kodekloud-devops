@@ -47,13 +47,13 @@ The key's randomart image is:
 ```
 root@jump_host ~# `cat > /etc/puppetlabs/code/environments/production/manifests/demo.pp<<EOF`
 ```
-$thor_sshkey=\'$(awk '{print $2}' ~thor/.ssh/id_rsa.pub)\'
+\$thor_sshkey='$(awk "{print $2}" ~thor/.ssh/id_rsa.pub)'
 class ssh_node1 {
   ssh_authorized_key { 'tony@stapp01.stratos.xfusioncorp.com':
     ensure => 'present',
     user   => 'tony',
     type   => 'ssh-rsa',
-    key    => $thor_sshkey,
+    key    => \$thor_sshkey,
   }
 }
 class ssh_node2 {
@@ -61,7 +61,7 @@ class ssh_node2 {
     ensure => 'present',
     user   => 'steve',
     type   => 'ssh-rsa',
-    key    => $thor_sshkey,
+    key    => \$thor_sshkey,
   }
 }
 class ssh_node3 {
@@ -69,7 +69,7 @@ class ssh_node3 {
     ensure => 'present',
     user   => 'banner',
     type   => 'ssh-rsa',
-    key    => $thor_sshkey,
+    key    => \$thor_sshkey,
   }
 }
 
@@ -82,6 +82,7 @@ node stapp02.stratos.xfusioncorp.com {
 node stapp03.stratos.xfusioncorp.com {
   include ssh_node3
 }
+EOF
 ```
 root@jump_host ~# `puppet parser validate /etc/puppetlabs/code/environments/production/manifests/demo.pp`  
 
