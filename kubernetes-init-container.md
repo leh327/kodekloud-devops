@@ -15,3 +15,49 @@ Below is a sample scenario that the team is going to test first.
     Volume to be named as ic-volume-datacenter and it should be an emptyDir type.
 
 Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
+
+# Solution
+
+```
+cat << EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ic-datacenter
+  name: ic-deploy-datacenter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ic-datacenter
+  template:
+    metadata:
+      labels:
+        app: ic-datacenter
+    spec:
+      volumes:
+      - name: ic-volume-datacenter
+        emptyDir: {}
+      initContainers:
+      - image: debian:latest
+        name: debian
+        command: ['/bin/bash', '-c', 'echo Init Done - Welcome to xFusionCorp Industries > /ic/beta']
+        name: ic-msg-datacenter
+        volumeMounts:
+        - mountPath: /ic
+          name: ic-volume-datacenter
+      containers:
+      - image: debian:latest
+        name: debian
+        command: ['/bin/bash', '-c', 'while true; do cat /ic/beta; sleep 5; done']
+        volumeMounts:
+        - mountPath: /ic
+          name: ic-volume-datacenter
+        name: ic-main-datacenter
+EOF
+```
+thor@jump_host ~$ kubectl get deployment
+NAME                   READY   UP-TO-DATE   AVAILABLE   AGE
+ic-deploy-datacenter   1/1     1            1           7m48s
+thor@jump_host ~$
