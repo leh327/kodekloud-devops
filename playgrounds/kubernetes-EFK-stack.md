@@ -75,14 +75,103 @@ Get _cat/health?v
 epoch      timestamp cluster        status node.total node.data shards pri relo init unassign pending_tasks max_task_wait_time active_shards_percent
 1664043850 18:24:10  docker-cluster yellow          1         1      5   5    0    0        5             0                  -                 50.0%
 ```
+
 3. Get indexes
+### Query
 ```
 GET _cat/indices?v
+```
+
+### Output
 ```
 health status index                     uuid                   pri rep docs.count docs.deleted store.size pri.store.size
 yellow open   filebeat-6.4.2-2022.09.24 RE-pKs0MRaWldazoM7CJXQ   5   1       3061            0    650.9kb        650.9kb
 ```
 
-4. Get all records for filebeat
+4. Get all records for filebeat whose hostname `sandbox-worker2` and input type is `log`
+### Query
 ```
-GET 
+GET filebeat-6.4.2-2022.09.24/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": {
+          "beat.hostname": "sandbox-worker2"
+        }},
+        { "match": {
+          "input.type": "log"
+        }}
+      ]
+    }
+  }
+}
+```
+### Output
+```
+{
+  "took": 9,
+  "timed_out": false,
+  "_shards": {
+    "total": 5,
+    "successful": 5,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 8361,
+    "max_score": 0.0006113404,
+    "hits": [
+      {
+        "_index": "filebeat-6.4.2-2022.09.24",
+        "_type": "doc",
+        "_id": "-GC2cIMBATjl2pnl_Jk1",
+        "_score": 0.0006113404,
+        "_source": {
+          "@timestamp": "2022-09-24T18:16:18.657Z",
+          "input": {
+            "type": "log"
+          },
+          "beat": {
+            "name": "sandbox-worker2",
+            "hostname": "sandbox-worker2",
+            "version": "6.4.2"
+          },
+          "host": {
+            "name": "sandbox-worker2"
+          },
+          "offset": 4157,
+          "message": "[2022-09-24 18:14:06,372] WARNING in event-simulator: USER5 Failed to Login as the account is locked due to MANY FAILED ATTEMPTS.",
+          "source": "/var/log/event-simulator/app.log",
+          "prospector": {
+            "type": "log"
+          }
+        }
+      },
+      {
+        "_index": "filebeat-6.4.2-2022.09.24",
+        "_type": "doc",
+        "_id": "-WC2cIMBATjl2pnl_Jk1",
+        "_score": 0.0006113404,
+        "_source": {
+          "@timestamp": "2022-09-24T18:16:18.657Z",
+          "host": {
+            "name": "sandbox-worker2"
+          },
+          "message": "[2022-09-24 18:14:06,372] WARNING in event-simulator: USER7 Order failed as the item is OUT OF STOCK.",
+          "source": "/var/log/event-simulator/app.log",
+          "offset": 4287,
+          "input": {
+            "type": "log"
+          },
+          "prospector": {
+            "type": "log"
+          },
+          "beat": {
+            "name": "sandbox-worker2",
+            "hostname": "sandbox-worker2",
+            "version": "6.4.2"
+          }
+        }
+      },
+```
