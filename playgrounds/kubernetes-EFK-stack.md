@@ -20,7 +20,7 @@ done
 ```
 
 # Exercise
-1. Get all records
+1. Get all records - press `Ctrl+Enter` to execute 
 ## Query
 ```
 GET _search
@@ -65,4 +65,24 @@ Get _search
       },
 ```
 
-2. 
+2. Get overall cluster health
+### Query
+```
+Get _cat/health?v
+```
+### Output
+```
+epoch      timestamp cluster        status node.total node.data shards pri relo init unassign pending_tasks max_task_wait_time active_shards_percent
+1664043850 18:24:10  docker-cluster yellow          1         1      5   5    0    0        5             0                  -                 50.0%
+```
+3. Get indexes
+```
+GET _cat/indices?v
+```
+health status index                     uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+yellow open   filebeat-6.4.2-2022.09.24 RE-pKs0MRaWldazoM7CJXQ   5   1       3061            0    650.9kb        650.9kb
+```
+
+4. Get all records for filebeat
+```
+GET 
