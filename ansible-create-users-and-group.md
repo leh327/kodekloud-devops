@@ -80,7 +80,7 @@ thor@jump_host ~$ `cat >/home/thor/playbooks/add_users.yml<<EOF`
     user:
       name: '{{ item }}'
       groups: admins,wheel
-      password: "{{ admins.password | password_hash('sha512') }}"
+      password: "{{ admins_group.password | password_hash('sha512') }}"
     with_items:
     - '{{admins}}'
      
@@ -89,7 +89,7 @@ thor@jump_host ~$ `cat >/home/thor/playbooks/add_users.yml<<EOF`
       name: '{{ item }}'
       group: developers
       home: 
-      password: "{{ developers.password | password_hash('sha512') }}"
+      password: "{{ developers_group.password | password_hash('sha512') }}"
     with_items:
     - '{{developers}}' 
 ```                                                      
