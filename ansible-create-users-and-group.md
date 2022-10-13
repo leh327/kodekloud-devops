@@ -88,7 +88,7 @@ thor@jump_host ~$ `cat >/home/thor/playbooks/add_users.yml<<EOF`
     user:
       name: '{{ item }}'
       group: developers
-      home: 
+      home: /var/www
       password: "{{ developers_group.password | password_hash('sha512') }}"
     with_items:
     - '{{developers}}' 
