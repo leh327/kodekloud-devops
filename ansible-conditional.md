@@ -24,6 +24,7 @@ thor@jump_host ~/ansible$ `cat >playbook.yml<<EOF`
 ```
 - hosts: all
   gather_facts: yes
+  become: yes
   tasks:
     - copy:
         src: /usr/src/finance/blog.txt
@@ -31,20 +32,20 @@ thor@jump_host ~/ansible$ `cat >playbook.yml<<EOF`
         owner: tony
         group: tony
         mode: '0644'
-      when: ansible_nodename == 'stapp01'
+      when: ansible_nodename == 'stapp01.stratos.xfusioncorp.com'
     - copy:
         src: /usr/src/finance/story.txt
         dest: /opt/finance/story.txt
         owner: steve
         group: steve
         mode: '0644'
-      when: ansible_nodename == 'stapp02'
+      when: ansible_nodename == 'stapp02.stratos.xfusioncorp.com'
     - copy:
         src: /usr/src/finance/media.txt
         dest: /opt/finance/media.txt
         owner: banner
         group: banner
         mode: '0644'
-      when: ansible_nodename == 'stapp03'
+      when: ansible_nodename == 'stapp03.stratos.xfusioncorp.com'
 EOF
 ```
