@@ -20,16 +20,29 @@ Note: The kubectl utility on jump_host has been configured to work with the kube
 
 # Solution
 
+### References:
+https://github.com/helm/chartmuseum
+https://github.com/helm/chartmuseum/releases
+
 ### Install Helm 3
 thor@jump_host ~$ `curl -O https://get.helm.sh/helm-v3.10.2-linux-amd64.tar.gz`  
 thor@jump_host ~$ `sha256sum helm-v3.10.2-linux-amd64.tar.gz > sum.txt` 
-thor@jump_host ~$ `cat sum.txt checksum.txt`  
+thor@jump_host ~$ grep "2315941a13291c277dac9f65e75ead56386440d3907e0540bf157ae70f188347" sum.txt 
 ```
 2315941a13291c277dac9f65e75ead56386440d3907e0540bf157ae70f188347  helm-v3.10.2-linux-amd64.tar.gz
-2315941a13291c277dac9f65e75ead56386440d3907e0540bf157ae70f188347
 ```
 thor@jump_host ~$ `gunzip -c helm-v3.10.2-linux-amd64.tar.gz |tar xvf -`
 thor@jump_host ~$ `sudo cp linux-amd64/helm /usr/local/bin`
+
+### Install and configure chartmuseum
+thor@jump_host ~$ `curl -sL -o h.sh https://raw.githubusercontent.com/helm/chartmuseum/main/scripts/get-chartmuseum`. 
+thor@jump_host ~$ `sudo yum install openssl`. 
+thor@jump_host ~$ `bash h.sh`. 
+thor@jump_host ~$ `chartmuseum --debug --port=8090 \
+  --storage="local" \
+  --storage-local-rootdir="./chartstorage"`  
+  
+### Create and add chart to chartmuseum
 thor@jump_host ~$ `helm create mysql-server`
 ```
 WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /home/thor/.kube/config
@@ -47,11 +60,11 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: http
+      targetPort: {{ .Values.service.target_port }}
       protocol: TCP
-      name: http
-   {{ if eq .Values.service.type NodePort }}
-      nodePort: {{ .Values.service.nodeport | nindent 6 }}
+      name: {{ .Values.service.name }}
+   {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.node_port }}
    {{- end }}
   selector:
     {{- include "mysql-server.selectorLabels" . | nindent 4 }}
@@ -118,7 +131,7 @@ spec:
         {{- include "mysql-server.selectorLabels" . | nindent 8 }}
     spec:
       volumes:
-      - name: {{ .Values.storage.volume_name }} 
+      - name: {{ .Values.persistent_volume.volume_name }} 
         persistentVolumeClaim:
           claimName: {{ .Values.persistent_volume.claim_name }}
       {{- with .Values.imagePullSecrets }}
@@ -129,16 +142,38 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
+      
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-root-pass
+                  key: password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-db-url
+                  key: database
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-user-pass
+                  key: username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-user-pass
+                  key: password
           volumeMounts:
           - name: {{ .Values.persistent_volume.claim_name }}
             mountPath: {{ .Values.persistent_volume.mount_path }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
+            - name: {{ .Values.service.port_name }}
               containerPort: {{ .Values.service.port }}
               protocol: TCP
               targetPort: {{ .Values.service.target_port }}
@@ -188,7 +223,7 @@ image:
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: ""
+fullnameOverride: "mysql-deployment"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -214,8 +249,11 @@ securityContext: {}
 
 service:
   type: NodePort
-  port: 80
-  target_port: 30007
+  port: 3306
+  port_name: mysql
+  target_port: 3306
+  node_port: 30007
+  
 
 ingress:
   enabled: false
@@ -259,5 +297,10 @@ tolerations: []
 affinity: {}
 
 ```
-thor@jump_host ~/mysql-server$ 
+thor@jump_host ~/mysql-server$ `helm package .`
+curl --data-binary"@mysql-server-0.1.0.tgz" http://localhost:8090/api/charts
+helm repo update
+helm search repo chartmuseum
+helm install mysql-deployment chartmuseum/mysql-server
+helm list
 
