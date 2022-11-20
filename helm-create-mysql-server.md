@@ -23,6 +23,13 @@ Note: The kubectl utility on jump_host has been configured to work with the kube
 ### References:
 https://github.com/helm/chartmuseum
 https://github.com/helm/chartmuseum/releases
+https://medium.com/devops-dudes/getting-your-vault-secrets-into-kubernetes-82ec7ffcee6f
+https://developer.hashicorp.com/vault/tutorials/kubernetes/agent-kubernetes
+https://developer.hashicorp.com/vault/docs/platform/k8s/injector
+https://github.com/hashicorp/vault-helm
+https://developer.hashicorp.com/vault/docs/platform/k8s
+https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-raft-deployment-guide
+
 
 ### Install Helm 3
 thor@jump_host ~$ `curl -O https://get.helm.sh/helm-v3.10.2-linux-amd64.tar.gz`  
