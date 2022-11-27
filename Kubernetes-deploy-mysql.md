@@ -153,6 +153,6 @@ root@kodekloud-control-plane /# `mysql -u root -pYUIidhb667 -h $(kubectl get pod
 ```
 MYSQL> alter user 'kodekloud_rin'@'%' identified by mysql_native_password 'YchZHRcLkL';
 ```
-thor@jump_host ~$ `mysql -u kodekloud_rin -h $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}') -p 30007`
+thor@jump_host ~$ `mysql -u kodekloud_rin -pYchZHRcLkL -h $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}') -P 30007`
                                   
                                   
