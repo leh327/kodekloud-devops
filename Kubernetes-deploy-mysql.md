@@ -16,7 +16,9 @@ Note: The kubectl utility on jump_host has been configured to work with the kube
 
 
 # Solution
-cat > mysql-deployment.yaml <<EOF
+
+thor@jump_host ~$ `cat > mysql-deployment.yaml <<EOF`
+```
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -130,7 +132,7 @@ kind: Service
 metadata:
   labels:
     app: mysql-deployment
-  name: mysql-deployment
+  name: mysql
 spec:
   type: NodePort
   ports:
@@ -141,9 +143,16 @@ spec:
   selector:
     app: mysql-deployment                                  
 EOF
-kubectl apply -f mysql-deployment
-$ install mysql client
-$ test connection using mysql client and user/password
-mysql -u kodekloud_rin -h $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}') -p 30007
+```
+thor@jump_host ~$ `kubectl apply -f mysql-deployment`  
+thor@jump_host ~$ `sudo yum install mariadb`  
+
+### overcome caching_sha2_password plugin issue by changing password for user with 'identified by' key words:
+### https://www.percona.com/blog/upgrade-your-libraries-authentication-plugin-caching_sha2_password-cannot-be-loaded/
+root@kodekloud-control-plane /# `mysql -u root -pYUIidhb667 -h $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}') -P 30007`  
+```
+MYSQL> alter user 'kodekloud_rin'@'%' identified by mysql_native_password 'YchZHRcLkL';
+```
+thor@jump_host ~$ `mysql -u kodekloud_rin -h $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}') -p 30007`
                                   
                                   
