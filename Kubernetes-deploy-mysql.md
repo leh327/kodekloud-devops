@@ -151,7 +151,7 @@ thor@jump_host ~$ `sudo yum install mariadb`
 ### https://www.percona.com/blog/upgrade-your-libraries-authentication-plugin-caching_sha2_password-cannot-be-loaded/
 root@kodekloud-control-plane /# `mysql -u root -pYUIidhb667 -h $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}') -P 30007`  
 ```
-MYSQL> alter user 'kodekloud_rin'@'%' identified by mysql_native_password 'YchZHRcLkL';
+MYSQL> alter user 'kodekloud_rin'@'%' identified with mysql_native_password by 'YchZHRcLkL';
 ```
 thor@jump_host ~$ `mysql -u kodekloud_rin -pYchZHRcLkL -h $(kubectl get pod -o jsonpath='{.items[*].spec.nodeName}') -P 30007`
                                   
