@@ -36,7 +36,7 @@ spec:
     command:
     - sh
     - "-c"
-    - while true; do date; sleep ;done | tee /opt/sysops/time/time-check.log
+    - while true; do date; sleep \$TIME_FREQ ;done | tee /opt/sysops/time/time-check.log
     image: busybox:latest
     volumeMounts:
     - mountPath: /opt/sysops/time
