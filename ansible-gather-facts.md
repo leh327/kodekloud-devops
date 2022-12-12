@@ -21,7 +21,7 @@ thor@jump_host ~/playbooks$ `cat > index.yml <<EOF`
   tasks:
   - blockinfile:
       dest: /root/facts.txt
-      block: "Ansible manged node IP is {{ ansible_default_ipv4.address }}"
+      block: "Ansible managed node IP is {{ ansible_default_ipv4.address }}"
       create: yes
       marker: ""
   - package:
@@ -73,19 +73,19 @@ stapp03                    : ok=5    changed=4    unreachable=0    failed=0    s
 thor@jump_host ~/playbooks$ `curl stapp01`
 ```
 
-Ansible manged node IP is 172.16.238.10
+Ansible managed node IP is 172.16.238.10
 
 ```
 thor@jump_host ~/playbooks$ `curl stapp02`
 ```
 
-Ansible manged node IP is 172.16.238.11
+Ansible managed node IP is 172.16.238.11
 
 ```
 thor@jump_host ~/playbooks$ `curl stapp03`
 ```
 
-Ansible manged node IP is 172.16.238.12
+Ansible managed node IP is 172.16.238.12
 
 ```
 thor@jump_host ~/playbooks$ 
