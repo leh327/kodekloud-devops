@@ -16,11 +16,12 @@ Create a node port type service named web-nautilus using node port 30008 to expo
 Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
 
 # Solution
+### Reference: https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/#create-a-persistentvolume
 ```
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: task-pv-volume
+  name: pv-datacenter
   labels:
     type: local
 spec:
