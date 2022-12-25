@@ -16,7 +16,7 @@ Create a node port type service named web-nautilus using node port 30008 to expo
 Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
 
 # Solution
-
+```
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -76,3 +76,4 @@ spec:
     nodePort: 30008
     targetPort: 80
   type: NodePort
+```
