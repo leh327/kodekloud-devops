@@ -17,7 +17,6 @@ Mount the volume shared-logs on both containers at location /var/log/nginx, all 
 Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
 
 # Solution
-### Reference: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 thor@jump-host ~$ `tee pod.yaml<<EOF`
 ```
 ---
