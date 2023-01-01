@@ -8,9 +8,13 @@ Below is a sample scenario that the team is going to test first.
 
     Configure spec as replicas should be 1, labels app should be ic-datacenter, template's metadata lables app should be the same ic-datacenter.
 
-    The initContainers should be named as ic-msg-datacenter, use image fedora, preferably with latest tag and use command '/bin/bash', '-c' and 'echo Init Done - Welcome to xFusionCorp Industries > /ic/news'. The volume mount should be named as ic-volume-datacenter and mount path should be /ic.
+    The initContainers should be named as ic-msg-datacenter, use image fedora, preferably with latest tag and use  
+    command '/bin/bash', '-c' and 'echo Init Done - Welcome to xFusionCorp Industries > /ic/news'.  
+    The volume mount should be named as ic-volume-datacenter and mount path should be /ic.
 
-    Main container should be named as ic-main-datacenter, use image fedora, preferably with latest tag and use command '/bin/bash', '-c' and 'while true; do cat /ic/news; sleep 5; done'. The volume mount should be named as ic-volume-datacenter and mount path should be /ic.
+    Main container should be named as ic-main-datacenter, use image fedora, preferably with latest tag and use command  
+    '/bin/bash', '-c' and 'while true; do cat /ic/news; sleep 5; done'. The volume mount should be named as ic-volume-datacenter  
+    and mount path should be /ic.
 
     Volume to be named as ic-volume-datacenter and it should be an emptyDir type.
 
