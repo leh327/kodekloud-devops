@@ -2,9 +2,9 @@
 
 
 # Solution
-root@jump_host ~# yum install -y yum-utils
-root@jump_host ~# yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
-root@jump_host ~# yum -y install terraform
+root@jump_host ~# `yum install -y yum-utils`  
+root@jump_host ~# `yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo`  
+root@jump_host ~# `yum -y install terraform`  
 
 thor@jump_host ~$ `cat >>main.tf<<EOF`
 ```
