@@ -26,9 +26,9 @@ root@jump_host ~# `cat .bash_history`
 ```
 yum -y install ansible kubernetes-client python3 python3-pip
 pip3 install --upgrade pip
-pip3 install openshift
+pip3 install openshift pyHelm
 ```
-
+thor@jump_host ~$ `
 thor@jump_host ~$ `ansible-galaxy collection install kubernetes.core`
 ```
 Process install dependency map
@@ -119,3 +119,136 @@ thor@jump_host ~$ `tee pod_with_pv.yaml<<EOF`
             nodePort: 30008
 ```
 thor@jump_host ~$ ansible-playbook pv.yaml -e 'ansible_python_interpreter=/usr/bin/python3'
+
+
+# helm chart
+
+thor@jump_host ~$ `tee values_override.yaml<<EOF`
+```
+# Default values for xfusion.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+volumes:
+  name: xfusion-volume
+  pvcName: pvc-xfusion
+  pvName: pv-xfusion
+  pvSize: 5Gi
+  pvcRequestSize: 1Gi
+  mountPath: /usr/share/nginx/html
+  hostPath: /mnt/data
+
+Pod:
+  name: pod-xfusion
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+nameOverride: "pod-xfusion"
+fullnameOverride: ""
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30008
+EOF
+```
+
+
+thor@jump_host ~/xfusion/templates$ `tee pod.yaml <<EOF` 
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Values.Pod.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "xfusion.labels" . | nindent 4 }}
+spec:
+    spec:
+      volumes:
+      - name: {{ .Values.volumes.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.pvcName }}
+      containers:
+        - name: {{ .Values.nameOverride }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          volumeMounts:
+          - name: {{ .Values.volumes.name }}
+            mountPath: {{ .Values.volumes.mountPath }}
+```
+
+thor@jump_host ~/xfusion/templates$ cat pv.yaml 
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.volumes.pvName }}
+spec:
+  capacity:
+    storage: {{ .Values.volumes.pvSize }}
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: {{ .Values.volumes.hostPath }}
+```
+
+thor@jump_host ~/xfusion/templates$ cat pvc.yaml 
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.volumes.pvcName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  resources:
+    requests:
+      storage: {{ .Values.volumes.pvcRequestSize }}
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: manual
+```
+
+thor@jump_host ~/xfusion/templates$ cat service.yaml 
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "xfusion.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "xfusion.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "xfusion.selectorLabels" . | nindent 4 }}
+```
+thor@jump_host ~$ `tee xfusion.yaml<<EOF`
+```
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+   - name: Deploy chart from local path
+     kubernetes.core.helm:
+       name: xfusion
+       chart_ref: /home/thor/pvxfusion
+       release_namespace: default
+       values_files:
+        - /home/thor/xfusion/values.yaml
+```
+thor@jump_host ~$ ansible-playbook xfusion.yaml -e 'ansible_python_interpreter=/usr/bin/python3'
+
