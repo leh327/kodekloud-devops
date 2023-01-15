@@ -248,7 +248,7 @@ thor@jump_host ~$ `tee xfusion.yaml<<EOF`
        chart_ref: /home/thor/pvxfusion
        release_namespace: default
        values_files:
-        - /home/thor/xfusion/values.yaml
+        - /home/thor/values-override.yaml
 ```
 thor@jump_host ~$ ansible-playbook xfusion.yaml -e 'ansible_python_interpreter=/usr/bin/python3'
 
