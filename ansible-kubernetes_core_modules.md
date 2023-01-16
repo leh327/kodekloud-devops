@@ -24,7 +24,7 @@ Note: The kubectl utility on jump_host has been configured to work with the kube
 # Solution
 root@jump_host ~# `cat .bash_history`
 ```
-yum -y install ansible kubernetes-client python3 python3-pip
+yum -y install ansible kubernetes-client python3 python3-pip git unzip
 pip3 install --upgrade pip
 pip3 install openshift pyHelm
 ```
@@ -85,7 +85,8 @@ thor@jump_host ~$ `tee pod_with_pv.yaml<<EOF`
         kind: Pod
         metadata:
           name: pod-datacenter
-          app: nginx
+          labels:
+            app: nginx
           namespace: default
         spec:
           volumes:
@@ -117,12 +118,15 @@ thor@jump_host ~$ `tee pod_with_pv.yaml<<EOF`
           - port: 80
             targetPort: 80
             nodePort: 30008
+EOF
 ```
-thor@jump_host ~$ ansible-playbook pv.yaml -e 'ansible_python_interpreter=/usr/bin/python3'
+thor@jump_host ~$ `ansible-playbook pv.yaml -e 'ansible_python_interpreter=/usr/bin/python3'`
 
 
 # helm chart
-
+thor@jump_host ~$ `curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3`  
+thor@jump_host ~$ `chmod 700 get_helm.sh`  
+thor@jump_host ~$ `./get_helm.sh`  
 thor@jump_host ~$ `tee values_override.yaml<<EOF`
 ```
 # Default values for xfusion.
@@ -183,9 +187,10 @@ spec:
           volumeMounts:
           - name: {{ .Values.volumes.name }}
             mountPath: {{ .Values.volumes.mountPath }}
+EOF
 ```
 
-thor@jump_host ~/xfusion/templates$ cat pv.yaml 
+thor@jump_host ~/xfusion/templates$ `tee pv.yaml <EOF`
 ```
 apiVersion: v1
 kind: PersistentVolume
@@ -199,9 +204,10 @@ spec:
   storageClassName: manual
   hostPath:
     path: {{ .Values.volumes.hostPath }}
+EOF
 ```
 
-thor@jump_host ~/xfusion/templates$ cat pvc.yaml 
+thor@jump_host ~/xfusion/templates$ `tee pvc.yaml <<EOF`
 ```
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -215,9 +221,10 @@ spec:
   accessModes:
   - ReadWriteOnce
   storageClassName: manual
+EOF
 ```
 
-thor@jump_host ~/xfusion/templates$ cat service.yaml 
+thor@jump_host ~/xfusion/templates$ `tee service.yaml<<EOF`
 ```
 apiVersion: v1
 kind: Service
@@ -235,6 +242,7 @@ spec:
       name: http
   selector:
     {{- include "xfusion.selectorLabels" . | nindent 4 }}
+EOF
 ```
 thor@jump_host ~$ `tee xfusion.yaml<<EOF`
 ```
@@ -249,6 +257,120 @@ thor@jump_host ~$ `tee xfusion.yaml<<EOF`
        release_namespace: default
        values_files:
         - /home/thor/values-override.yaml
+EOF
 ```
-thor@jump_host ~$ ansible-playbook xfusion.yaml -e 'ansible_python_interpreter=/usr/bin/python3'
+thor@jump_host ~$ `ansible-playbook xfusion.yaml -e 'ansible_python_interpreter=/usr/bin/python3'`
+
+# Terraform
+thor@jump_host ~$ `ansible-galaxy collection install community.general`
+thor@jump_host ~$ `git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv`
+thor@jump_host ~$ `export PATH=${PATH}:~/.tfenv/bin`  
+thor@jump_host ~$ `tfenv install`
+thor@jump_host ~$ `tfenv list`
+```
+  1.3.7
+No default set. Set with 'tfenv use <version>'
+```
+thor@jump_host ~$ `tfenv use 1.3.7`
+```
+Switching default version to v1.3.7
+Default version (when not overridden by .terraform-version or TFENV_TERRAFORM_VERSION) is now: 1.3.7
+```
+thor@jump_host ~$ `tfenv list`
+```
+* 1.3.7 (set by /home/thor/.tfenv/version)
+```
+
+thor@jump_host ~/datacenter$ `tee main.tf <<EOF`
+```
+provider "kubernetes" {
+  config_path = "/home/thor/.kube/config"
+}
+
+resource "kubernetes_pod_v1" "pod-datacenter" {
+}
+
+resource "kubernetes_service_v1" "web-datacenter" {
+}
+
+resource "kubernetes_persistentvolume_v1" "pv-datacenter" {
+}
+
+resource "kubernetes_persistentvolumeclaim_v1" "pvc-datacenter" {
+}
+```
+thor@jump_host ~/datacenter$ terraform init
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Reusing previous version of hashicorp/kubernetes from the dependency lock file
+- Using previously-installed hashicorp/kubernetes v2.16.1
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+
+
+thor@jump_host ~/datacenter$ terraform import kubernetes_pod_v1.pod-datacenter default/pod-datacenter
+kubernetes_pod_v1.pod-datacenter: Importing from ID "default/pod-datacenter"...
+kubernetes_pod_v1.pod-datacenter: Import prepared!
+  Prepared kubernetes_pod_v1 for import
+kubernetes_pod_v1.pod-datacenter: Refreshing state... [id=default/pod-datacenter]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+
+thor@jump_host ~/datacenter$
+
+thor@jump_host ~/datacenter$ terraform import kubernetes_persistent_volume_v1.pv-datacenter pv-datacenter
+kubernetes_persistent_volume_v1.pv-datacenter: Importing from ID "pv-datacenter"...
+kubernetes_persistent_volume_v1.pv-datacenter: Import prepared!
+  Prepared kubernetes_persistent_volume_v1 for import
+kubernetes_persistent_volume_v1.pv-datacenter: Refreshing state... [id=pv-datacenter]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+
+thor@jump_host ~/datacenter$ 
+
+thor@jump_host ~/datacenter$ terraform import kubernetes_persistent_volume_claim_v1.pvc-datacenter default/pvc-datacenter
+kubernetes_persistent_volume_claim_v1.pvc-datacenter: Importing from ID "default/pvc-datacenter"...
+kubernetes_persistent_volume_claim_v1.pvc-datacenter: Import prepared!
+  Prepared kubernetes_persistent_volume_claim_v1 for import
+kubernetes_persistent_volume_claim_v1.pvc-datacenter: Refreshing state... [id=default/pvc-datacenter]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+
+thor@jump_host ~/datacenter$ terraform import kubernetes_service_v1.web-datacenter default/web-datacenter
+kubernetes_service_v1.web-datacenter: Importing from ID "default/web-datacenter"...
+kubernetes_service_v1.web-datacenter: Import prepared!
+  Prepared kubernetes_service_v1 for import
+kubernetes_service_v1.web-datacenter: Refreshing state... [id=default/web-datacenter]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+
+thor@jump_host ~/datacenter$ terraform state list
+kubernetes_persistent_volume_claim_v1.pvc-datacenter
+kubernetes_persistent_volume_v1.pv-datacenter
+kubernetes_pod_v1.pod-datacenter
+kubernetes_service_v1.web-datacenter
+thor@jump_host ~/datacenter$ 
+
 
