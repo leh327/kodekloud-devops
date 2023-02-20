@@ -89,3 +89,7 @@ root@jump_host ~# `puppet parser validate /etc/puppetlabs/code/environments/prod
 thor@jump_host ~$ `for i in banner@stapp03 steve@stapp02 tony@stapp01; do ssh -t $i sudo puppet agent -tv; done`  
 
 thor@jump_host ~$ `for i in banner@stapp03 steve@stapp02 tony@stapp01; do ssh -t $i; done`
+
+# References:
+- https://www.puppet.com/docs/puppet/7/lang_variables.html#lang_variables
+- https://forge.puppet.com/modules/puppetlabs/sshkeys_core/readme
