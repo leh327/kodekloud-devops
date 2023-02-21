@@ -49,7 +49,7 @@ root@jump_host ~# `cat > /etc/puppetlabs/code/environments/production/manifests/
 ```
 \$thor_sshkey='$(awk '{print $2}' ~thor/.ssh/id_rsa.pub)'
 class ssh_node1 {
-  ssh_authorized_key { 'tony@stapp01.stratos.xfusioncorp.com':
+  ssh_authorized_key { 'thor@jump-host.stratos.xfusioncorp.com':
     ensure => 'present',
     user   => 'tony',
     type   => 'ssh-rsa',
@@ -57,7 +57,7 @@ class ssh_node1 {
   }
 }
 class ssh_node2 {
-  ssh_authorized_key { 'steve@stapp02.stratos.xfusioncorp.com':
+  ssh_authorized_key { 'thor@jump-host.stratos.xfusioncorp.com':
     ensure => 'present',
     user   => 'steve',
     type   => 'ssh-rsa',
@@ -65,7 +65,7 @@ class ssh_node2 {
   }
 }
 class ssh_node3 {
-  ssh_authorized_key { 'banner@stapp03.stratos.xfusioncorp.com':
+  ssh_authorized_key { 'thor@jump-host.stratos.xfusioncorp.com':
     ensure => 'present',
     user   => 'banner',
     type   => 'ssh-rsa',
