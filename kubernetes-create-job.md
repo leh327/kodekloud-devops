@@ -3,36 +3,42 @@ The Nautilus DevOps team is working on to create few jobs in Kubernetes cluster.
 
 
 
-Create a job `countdown-xfusion`.
+Create a job countdown-devops.
 
-The spec template should be named as `countdown-xfusion` (under metadata), and the container should be named as `container-countdown-xfusion`
+The spec template should be named as countdown-devops (under metadata), and the container should be named as container-countdown-devops
 
-Use image `debian` with `latest` tag only and remember to mention tag i.e `debian:latest`, and `restart policy` should be `Never`.
+Use image fedora with latest tag only and remember to mention tag i.e fedora:latest, and restart policy should be Never.
 
-Use command `for i in 10 9 8 7 6 5 4 3 2 1 ; do echo $i ; done`
+Use command for i in 10 9 8 7 6 5 4 3 2 1 ; do echo $i ; done
 
 Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
 # Solution
-thor@jump_host ~$ cat <<EOF | kubectl apply -f -
+thor@jump_host ~$ `kubectl create job countdown-devops --image=fedora:latest --dry-run=client -o yaml -- "/bin/sh" "-c" 'for i in 10 9 8 7 6 5 4 3 2 1 ; do echo $i ; done' | sed '/        name: countdown-devops/s/        name: countdown-devops/        name: container-countdown-devops/' |tee job.yaml | kubectl apply -f -`
 ```
-job.batch/countdown-xfusion created
-thor@jump_host ~$ kubectl
+job.batch/countdown-devops created
+```
+thor@jump_host ~$ `cat job.yaml`
+```
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: countdown-xfusion
+  creationTimestamp: null
+  name: countdown-devops
 spec:
   template:
     metadata:
-      name: countdown-xfusion
+      creationTimestamp: null
     spec:
       containers:
-      - image: debian:latest
-        name: container-countdown-xfusion
-        command: ["bash", "-c", "for i in 10 9 8 7 6 5 4 3 2 1 ; do echo $i ; done"]
+      - command:
+        - /bin/sh
+        - -c
+        - for i in 10 9 8 7 6 5 4 3 2 1 ; do echo $i ; done
+        image: fedora:latest
+        name: container-countdown-devops
+        resources: {}
       restartPolicy: Never
-EOF
-job.batch/countdown-xfusion created
+status: {}
 ```
 thor@jump_host ~$ `kubectl get pod`
 ```
