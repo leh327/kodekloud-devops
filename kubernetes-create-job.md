@@ -13,7 +13,7 @@ Use command for i in 10 9 8 7 6 5 4 3 2 1 ; do echo $i ; done
 
 Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
 # Solution
-thor@jump_host ~$ `kubectl create job countdown-devops --image=fedora:latest --dry-run=client -o yaml -- "/bin/sh" "-c" 'for i in 10 9 8 7 6 5 4 3 2 1 ; do echo $i ; done' | sed '/        name: countdown-devops/s/        name: countdown-devops/        name: container-countdown-devops/' |tee job.yaml | kubectl apply -f -`
+thor@jump_host ~$ `kubectl create job countdown-devops --image=fedora:latest --dry-run=client -o yaml -- "/bin/sh" "-c" 'for i in 10 9 8 7 6 5 4 3 2 1 ; do echo $i ; done' | sed 's/        name: countdown-devops/        name: container-countdown-devops/' | sed 's/      creationTimestamp: null/      name: countdown-devops/' |tee job.yaml | kubectl apply -f -`
 ```
 job.batch/countdown-devops created
 ```
@@ -27,7 +27,7 @@ metadata:
 spec:
   template:
     metadata:
-      creationTimestamp: null
+      name: countdown-devops
     spec:
       containers:
       - command:
