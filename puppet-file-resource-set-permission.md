@@ -38,7 +38,7 @@ class media {
     mode => '0644',
   }
 }
-node 'stapp03.stratos.xfusion.com' {
+node 'stapp03.stratos.xfusioncorp.com' {
   include media
 }
 EOF
