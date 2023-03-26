@@ -30,7 +30,8 @@ on puppet master server, however it can take upto 2-3 minutes to start.
 
 # Solution
 ### Reference: https://www.puppet.com/docs/puppet/7/types/file.html
-$ `tee /etc/puppetlabs/code/environments/production/manifests/games.pp<<EOF`                                                 ```                
+$ `tee /etc/puppetlabs/code/environments/production/manifests/games.pp<<EOF`
+```                
 class media {
   file { '/opt/itadmin/media.txt':
     content => "Welcome to xFusionCorp Industries!",
