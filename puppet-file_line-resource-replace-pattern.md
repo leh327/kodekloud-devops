@@ -20,6 +20,7 @@ root@jump_host ~# `tee /etc/puppetlabs/code/environments/production/manifests/cl
 ```
 node 'stapp02.stratos.xfusioncorp.com' {
   file_line {'/opt/itadmin/cluster.txt':
+    path => '/opt/itadmin/cluster.txt',
     match => 'Welcome to Nautilus Industries!',
     line  => 'Welcome to xFusionCorp Industries!',
     replace => true
