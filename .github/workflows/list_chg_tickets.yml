@@ -22,7 +22,7 @@ jobs:
         uses: shundor/servicenow-actions@main
         id: snow
         with: 
-          sn_host:  "https://dev205508.service-now.com"
+          sn_host:  "${{ secrets.SN_HOST }}"
           sn_username: "${{ secrets.SN_USERNAME }}"
           sn_password: "${{ secrets.SN_PASSWORD }}"
           sn_client_id: "${{ secrets.SN_CLIENT_ID }}"
